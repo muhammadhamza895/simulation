@@ -5,7 +5,8 @@ function generatePoissonArrivals(req, res, next) {
     let currentTime = 0;
 
     while (currentTime < simulationTime) {
-        const interarrivalTime = Math.random() / lambda;
+        // const interarrivalTime = Math.random() / lambda;
+        const interarrivalTime = -Math.log(Math.random()) / lambda;
 
         currentTime += interarrivalTime;
 
@@ -15,6 +16,8 @@ function generatePoissonArrivals(req, res, next) {
     }
 
     res.locals.arrivalTimes = arrivalTimes;
+    // console.log({arrivalTimes})
+    // res.send({arrivalTimes})
     next()
 }
 
