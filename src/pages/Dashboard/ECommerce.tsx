@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartThree from '../../components/Charts/ChartThree';
@@ -6,11 +6,40 @@ import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import MapOne from '../../components/Maps/MapOne';
 import TableOne from '../../components/Tables/TableOne';
+import SelectGroupOne from '../../components/Forms/SelectGroup/SelectGroupOne';
+import { Formik } from 'formik';
+// import SimulationSchema from './formValidaton';
+import { SimulationDataInterface } from '../../API/simulation';
+import { startSimulation } from '../../API/simulation';
+import { toast } from 'react-toastify';
+import LineChart from '../../components/GoogleCharts/LineChart';
+
+interface FormValues {
+  numberOfCustomers: number;
+  perUnitTime: number;
+  simulationTime: number;
+}
 
 const ECommerce: React.FC = () => {
+  const [arrivalData, setArrivalData] = useState<any>(null);
+  const initialValues: FormValues = {
+    numberOfCustomers: 0,
+    perUnitTime: 0,
+    simulationTime: 0,
+  };
+
+  const submitForm = async (values: SimulationDataInterface) => {
+    const data = await startSimulation(values);
+    if (data?.data) {
+      const arrival = data?.data;
+      console.log({arrival})
+      setArrivalData([['time', 'no. of customers'], ...arrival]);
+    }
+  };
+
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+      {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats title="Total views" total="$3.456K" rate="0.43%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
@@ -95,18 +124,93 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-      </div>
+      </div> */}
+      <div className="bg-white max-w-242.5 w-full mx-auto py-6">
+        <h1 className="pl-10 text-3xl">Enter simulation detials</h1>
+        <Formik
+          initialValues={initialValues}
+          // validate={SimulationSchema}
+          onSubmit={submitForm}
+        >
+          {(formik) => {
+            const {
+              values,
+              handleChange,
+              handleSubmit,
+              // errors,
+              // touched,
+              // handleBlur,
+              // isValid,
+              // dirty,
+            } = formik;
+            return (
+              <form action="#" onSubmit={handleSubmit}>
+                <div className="p-6.5">
+                  <div className="mb-4.5 flex flex-col gap-6 xl:flex-row items-center">
+                    <div className="w-full xl:w-1/2">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Number of Customers
+                      </label>
+                      <input
+                        type="number"
+                        name="numberOfCustomers"
+                        id="numberOfCustomers"
+                        value={values?.numberOfCustomers}
+                        onChange={handleChange}
+                        placeholder="Enter your first name"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <ChartOne />
+                    <div className="w-full xl:w-1/2">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        per unit time
+                      </label>
+                      <input
+                        type="number"
+                        name="perUnitTime"
+                        id="perUnitTime"
+                        value={values?.perUnitTime}
+                        onChange={handleChange}
+                        placeholder="Enter your last name"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Sumulation Time (minutes){' '}
+                      <span className="text-meta-1">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="simulationTime"
+                      id="simulationTime"
+                      value={values?.simulationTime}
+                      onChange={handleChange}
+                      placeholder="Enter your email address"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
+                  <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90 max-w-35">
+                    Start simulation
+                  </button>
+                </div>
+              </form>
+            );
+          }}
+        </Formik>
+      </div>
+      <div className='mt-4'>{!!arrivalData && <LineChart chartData={arrivalData} />}</div>{' '}
+      {/* <ChartOne />
         <ChartTwo />
         <ChartThree />
         <MapOne />
         <div className="col-span-12 xl:col-span-8">
           <TableOne />
         </div>
-        <ChatCard />
-      </div>
+        <ChatCard /> */}
     </>
   );
 };

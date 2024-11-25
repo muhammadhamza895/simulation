@@ -8,6 +8,6 @@ const { divideSimulationTime } = require('../helpers/simulation')
 // CONTROLLERS
 const { arrivalCounter } =  require('../controllers/arrival')
 
-router.get('/get-arrival-graph-data', generatePoissonArrivals, divideSimulationTime, arrivalCounter)
+router.post('/get-arrival-graph-data', generatePoissonArrivals, divideSimulationTime, arrivalCounter)
 
 module.exports = router
